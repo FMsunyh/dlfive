@@ -18,7 +18,7 @@ jupyter==1.0.0
 jupyter-client==5.1.0
 jupyter-console==5.2.0
 jupyter-core==4.3.0
-Keras==1.2.2
+Keras==2.0.9
 Mako==1.0.7
 Markdown==2.6.9
 MarkupSafe==1.0
@@ -48,7 +48,7 @@ PyYAML==3.12
 pyzmq==16.0.2
 qtconsole==4.3.1
 scikit-learn==0.19.0
-scipy==0.19.1
+scipy==1.0.0
 simplegeneric==0.8.1
 six==1.11.0
 sympy==1.1.1
