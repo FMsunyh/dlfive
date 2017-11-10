@@ -184,6 +184,7 @@ def train_neural_network():
 
 # endregion
 
+
 # In[10]:
 # region Training result
 
