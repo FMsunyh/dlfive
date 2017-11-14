@@ -8,6 +8,9 @@
 
 import tensorflow as tf
 import os
+
+import cifar10_input
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 learning_rate = 0.001
@@ -19,11 +22,29 @@ image_size = 24
 image_channel = 3
 n_classes = 10
 
-
+datast_dir = '/home/syh/dl/dlfive/data/cifar/'
 
 
 def get_distorted_train_batch(data_dir, batch_size):
-    pass
+    #data_dir='data/cifar/'
+
+    if not data_dir:
+        raise ValueError('Please supply a data_dir')
+
+    data_dir = os.path.join(data_dir, 'cifar-10-batches-bin')
+
+    images, labels = cifar10_input.distorted_inputs(data_dir=data_dir,batch_size=batch_size)
+    return images, labels
+
+def get_undistorted_eval_batch(eval_data, data_dir, batch_size):
+    if not data_dir:
+        raise ValueError('Please supply a data_dir')
+
+    data_dir = os.path.join(data_dir, 'cifar-10-batches-bin')
+
+    images, labels = cifar10_input.inputs(eval_data=eval_data, data_dir=data_dir, batch_size=batch_size)
+    return images, labels
+
 
 
 def get_undistorted_train_batch(eval_data, data_dir, batch_size):
@@ -132,16 +153,15 @@ with tf.Graph().as_default():
         top_K_op = tf.nn.in_top_k(predictions=logits, targets=lables_holder, k=1)
 
     with tf.name_scope('GetTrainBatch'):
-        image_train, labels_train = get_distorted_train_batch()
+        image_train, labels_train = get_distorted_train_batch(data_dir=datast_dir, batch_size=batch_size)
 
     with tf.name_scope('GetTestBatch'):
-        image_test, labels_test = get_undistorted_train_batch()
-
+        image_test, labels_test = get_undistorted_eval_batch(eval_data=True,data_dir=datast_dir, batch_size=batch_size)
 
 
     init_op = tf.global_variables_initializer()
 
     print('save the graph')
-    graph_writer = tf.summary.FileWriter(logdir='graphs/excise411', graph=tf.get_default_graph())
+    graph_writer = tf.summary.FileWriter(logdir='graphs/excise412', graph=tf.get_default_graph())
 
     graph_writer.close()
