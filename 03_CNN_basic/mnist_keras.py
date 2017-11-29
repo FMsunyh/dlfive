@@ -37,7 +37,7 @@ model = Sequential()
 
 model.add(Conv2D(32, kernel_size=(5,5), padding='same', activation='relu', input_shape=input_shape))
 model.add(MaxPool2D(pool_size=(2,2), strides=(2,2), padding='same'))
-Activation()
+
 model.add(Conv2D(64,kernel_size=(5,5), activation='relu', padding='same'))
 model.add(MaxPool2D(pool_size=(2,2), strides=(2,2), padding='same'))
 model.add(Dropout(0.025))
