@@ -61,7 +61,7 @@ def Conv2(x, W, b, stride=1, padding='SAME', activation=tf.nn.relu, act_name='re
     return y
 
 def Pool2d(x, pool=tf.nn.max_pool, k=2, stride=2, padding='SAME'):
-    return pool(x, ksize=[1, k, k, 1], strides=[1, stride, stride, 1], padding='SAME')
+    return pool(x, ksize=[1, k, k, 1], strides=[1, stride, stride, 1], padding=padding)
 
 
 def FullyConnected(x, W, b, activate=tf.nn.relu, act_name='relu'):
@@ -78,13 +78,13 @@ def Inference(images_holder):
     with tf.name_scope('Conv2d_1'):
         weights = WeightsVariable(shape=[11, 11, image_channel, conv1_kernel_num], name_str='weights', stddev=5e-2)
         biases = BiasesVariable(shape=[conv1_kernel_num], name_str='baises', init_value=0.0)
-        conv1_out = Conv2(images_holder, weights, biases, stride=1, padding='SAME')
+        conv1_out = Conv2(images_holder, weights, biases, stride=4, padding='SAME')
 
         with tf.name_scope('Pool2d_1'):
             pool1_out = Pool2d(conv1_out, pool=tf.nn.max_pool, k=3, stride=2, padding='VALID')
 
         with tf.name_scope('Conv2d_2'):
-            weights = WeightsVariable(shape=[13, 13, conv1_kernel_num, conv2_kernel_num], name_str='weights', stddev=5e-2)
+            weights = WeightsVariable(shape=[5, 5, conv1_kernel_num, conv2_kernel_num], name_str='weights', stddev=5e-2)
             biases = BiasesVariable(shape=[conv2_kernel_num], name_str='baises', init_value=0.0)
             conv2_out = Conv2(pool1_out, weights, biases, stride=1, padding='SAME')
 
@@ -92,17 +92,17 @@ def Inference(images_holder):
             pool2_out = Pool2d(conv2_out, pool=tf.nn.max_pool, k=3, stride=2, padding='VALID')
 
         with tf.name_scope('Conv2d_3'):
-            weights = WeightsVariable(shape=[13, 13, conv2_kernel_num, conv3_kernel_num], name_str='weights', stddev=5e-2)
+            weights = WeightsVariable(shape=[3, 3, conv2_kernel_num, conv3_kernel_num], name_str='weights', stddev=5e-2)
             biases = BiasesVariable(shape=[conv3_kernel_num], name_str='baises', init_value=0.0)
             conv3_out = Conv2(pool2_out, weights, biases, stride=1, padding='SAME')
 
         with tf.name_scope('Conv2d_4'):
-            weights = WeightsVariable(shape=[13, 13, conv3_kernel_num, conv4_kernel_num], name_str='weights', stddev=5e-2)
+            weights = WeightsVariable(shape=[3, 3, conv3_kernel_num, conv4_kernel_num], name_str='weights', stddev=5e-2)
             biases = BiasesVariable(shape=[conv4_kernel_num], name_str='baises', init_value=0.0)
             conv4_out = Conv2(conv3_out, weights, biases, stride=1, padding='SAME')
 
         with tf.name_scope('Conv2d_5'):
-            weights = WeightsVariable(shape=[13, 13, conv4_kernel_num, conv5_kernel_num], name_str='weights', stddev=5e-2)
+            weights = WeightsVariable(shape=[3, 3, conv4_kernel_num, conv5_kernel_num], name_str='weights', stddev=5e-2)
             biases = BiasesVariable(shape=[conv5_kernel_num], name_str='baises', init_value=0.0)
             conv5_out = Conv2(conv4_out, weights, biases, stride=1, padding='SAME')
 
