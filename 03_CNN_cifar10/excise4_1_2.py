@@ -69,7 +69,7 @@ def Conv2(x, W , b, stride=1, padding='SAME', activation=tf.nn.relu, act_name='r
     return  y
 
 def Pool2d(x, pool=tf.nn.max_pool, k=2, stride=2, padding='SAME'):
-    return  pool(x, ksize=[1,k,k,1], strides=[1,stride, stride, 1], padding='SAME')
+    return  pool(x, ksize=[1,k,k,1], strides=[1,stride, stride, 1], padding=padding)
 
 def FullyConnected(x, W, b, activate=tf.nn.relu, act_name='relu'):
     with tf.name_scope('Wx_b'):
