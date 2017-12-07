@@ -218,10 +218,10 @@ def TrainModel():
 
         with tf.name_scope('Train'):
             learning_rate = tf.placeholder(tf.float32)
-            globel_step = tf.Variable(0, name='global_step', trainable=False, dtype=tf.int64)
+            global_step = tf.Variable(0, name='global_step', trainable=False, dtype=tf.int64)
             optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate)
 
-            train_op = optimizer.minimize(total_loss_op, global_step=globel_step)
+            train_op = optimizer.minimize(total_loss_op, global_step=global_step)
 
         with tf.name_scope('Evaluate'):
             top_K_op = tf.nn.in_top_k(predictions=logits, targets=labels_holder, k=1)
@@ -282,7 +282,7 @@ def TrainModel():
                                                                             labels_holder: labels_batch,
                                                                             learning_rate: learning_rate_init})
 
-                training_step = sess.run(globel_step)
+                training_step = sess.run(global_step)
 
                 if training_step % display_step == 0:
                     predictions = sess.run([top_K_op],
