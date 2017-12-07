@@ -1,4 +1,3 @@
-from server.algorithm.utils import *
 import numpy as np
 import tensorflow as tf
 from keras.applications.imagenet_utils import preprocess_input

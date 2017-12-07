@@ -18,6 +18,3 @@ def set_gpu():
     import keras.backend.tensorflow_backend as ktf
     ktf.set_session(sess)
     return sess
-
-
-set_gpu()

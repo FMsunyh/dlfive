@@ -1,4 +1,8 @@
-from server.algorithm.utils import *
+from server.algorithm import utils
+from server.algorithm.utils import set_gpu
+
+set_gpu()
+
 import gc
 import os
 import keras.backend as K
