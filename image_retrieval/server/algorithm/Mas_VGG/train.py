@@ -1,6 +1,6 @@
+from server.algorithm.utils import *
 import gc
 import os
-
 import keras.backend as K
 import numpy as np
 import tensorflow as tf
@@ -9,7 +9,6 @@ from keras.callbacks import ModelCheckpoint
 from keras.optimizers import Adam
 from keras.preprocessing import image
 
-from server.algorithm import utils
 from server.algorithm.Mas_VGG import mas_vgg_model
 from server.algorithm.Mas_VGG.config import FLAGS
 
@@ -49,17 +48,15 @@ def train(hps):
             print(train_image_dir)
 
             # mas_vgg = model.Mas_VGG16(mode = 'train')
-            mas_vgg = mas_vgg_model.Mas_VGG16(mode = 'train')
+            mas_vgg = mas_vgg_model.Mas_VGG16(mode='train')
             model = mas_vgg.Mas_Vgg16()
 
             optimizer = Adam(lr=hps.min_lrn_rate)
             model.compile(optimizer=optimizer, loss=[triplet_loss, triplet_loss, triplet_loss])
 
-            weight_path = hps.model_dir +folder+ '_weights_{epoch:02d}_{loss:.4f}.hdf5'
+            weight_path = hps.model_dir + folder + '_weights_{epoch:02d}_{loss:.4f}.hdf5'
             print('save the weight: %s' % weight_path)
-            checkpointer = ModelCheckpoint(filepath = weight_path,
-                                                   monitor='loss', verbose=1, save_best_only=True, save_weights_only=True,
-                                                   mode='min', period=1)
+            checkpointer = ModelCheckpoint(filepath=weight_path, monitor='loss', verbose=1, save_best_only=True, save_weights_only=True, mode='min', period=1)
 
             history = model.fit_generator(multi_input_generator(train_image_dir, batch_size=hps.batch_size), steps_per_epoch=hps.steps_per_epoch, epochs=hps.epochs, verbose=1, callbacks=[checkpointer])
 
@@ -81,17 +78,17 @@ def main(_):
     hps = mas_vgg_model.HParams(batch_size=batch_size,
                                 min_lrn_rate=learning_rate,
                                 lrn_rate=0.1,
-                                steps_per_epoch = steps_per_epoch,
-                                epochs = epochs,
-                                image_dir = image_dir,
-                                model_dir = model_dir,
-                                output_dir= output_dir)
+                                steps_per_epoch=steps_per_epoch,
+                                epochs=epochs,
+                                image_dir=image_dir,
+                                model_dir=model_dir,
+                                output_dir=output_dir)
 
-    utils.set_gpu()
 
     train(hps)
+
 
 if __name__ == '__main__':
     # main()
     tf.logging.set_verbosity(tf.logging.INFO)
-    tf.app.run(main = main)
+    tf.app.run(main=main)

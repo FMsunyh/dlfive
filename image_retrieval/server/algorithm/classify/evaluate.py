@@ -1,10 +1,11 @@
+from server.algorithm.utils import *
 import numpy as np
 import tensorflow as tf
 from keras.applications.imagenet_utils import preprocess_input
 from keras.models import load_model
 from keras.preprocessing import image
 
-# from server.algorithm import utils
+#
 from server.algorithm.classify.config import FLAGS
 
 # import keras.backend as K
@@ -38,7 +39,6 @@ def predict_class(im_path=''):
     if im_path == '':
         im_path = '/home/syh/trunk/image_retrieval/development/server/static/images/yoins/1121_1/a/anchor/0.png'
 
-    # utils.set_gpu()
     feature = evaluate(im_path)
     print("classify softmax: %s" % feature)
 

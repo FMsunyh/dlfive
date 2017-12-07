@@ -4,7 +4,7 @@ from keras.models import Model
 
 num_classes = 6
 
-def Classify(object):
+def classify(object):
     def __init__(self):
         pass
 
