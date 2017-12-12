@@ -1,10 +1,11 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*- 
-# @Time : 12/1/2017 5:34 PM 
+# @Time : 12/12/2017 11:29 AM 
 # @Author : sunyonghai 
-# @File : vggnet11_session.py 
+# @File : vggnet16.py 
 # @Software: BG_AI
 # =========================================================
+
 import csv
 
 import tensorflow as tf
@@ -108,38 +109,43 @@ def AddLossesSummary(losses):
 
 def Inference(images_hodler, keep_prob=keep_prob_value):
     conv1_1 = Conv2d_Op(images_hodler, name='conv1_1', kh=3, kw=3, n_out=64, dh=1, dw=1)
-    pool1 = Pool2d_Op(conv1_1, name='pool1', kh=2, kw=2, dh=2, dw=2, padding='SAME')
+    conv1_2 = Conv2d_Op(conv1_1,       name='conv1_2', kh=3, kw=3, n_out=64, dh=1, dw=1)
+    pool1 = Pool2d_Op(conv1_2, name='pool1', kh=2, kw=2, dh=2, dw=2, padding='SAME')
 
-    AddActivationSummary(conv1_1)
+    AddActivationSummary(conv1_2)
     print_activation(pool1)
 
 
     conv2_1 = Conv2d_Op(pool1, name='conv2_1', kh=3, kw=3, n_out=128, dh=1, dw=1)
-    pool2 = Pool2d_Op(conv2_1, name='pool2', kh=2, kw=2, dh=2, dw=2, padding='SAME')
+    conv2_2 = Conv2d_Op(conv2_1, name='conv2_2', kh=3, kw=3, n_out=128, dh=1, dw=1)
+    pool2 = Pool2d_Op(conv2_2, name='pool2', kh=2, kw=2, dh=2, dw=2, padding='SAME')
 
-    AddActivationSummary(conv2_1)
+    AddActivationSummary(conv2_2)
     print_activation(pool2)
 
 
     conv3_1 = Conv2d_Op(pool2, name='conv3_1', kh=3, kw=3, n_out=256, dh=1, dw=1)
     conv3_2 = Conv2d_Op(conv3_1, name='conv3_2', kh=3, kw=3, n_out=256, dh=1, dw=1)
-    pool3 = Pool2d_Op(conv3_2, name='pool3', kh=2, kw=2, dh=2, dw=2, padding='SAME')
+    conv3_3 = Conv2d_Op(conv3_2, name='conv3_3', kh=3, kw=3, n_out=256, dh=1, dw=1)
+    pool3 = Pool2d_Op(conv3_3, name='pool3', kh=2, kw=2, dh=2, dw=2, padding='SAME')
 
-    AddActivationSummary(conv3_2)
+    AddActivationSummary(conv3_3)
     print_activation(pool3)
 
     conv4_1 = Conv2d_Op(pool3, name='conv4_1', kh=3, kw=3, n_out=512, dh=1, dw=1)
     conv4_2 = Conv2d_Op(conv4_1, name='conv4_2', kh=3, kw=3, n_out=512, dh=1, dw=1)
-    pool4 = Pool2d_Op(conv4_2, name='pool4', kh=2, kw=2, dh=2, dw=2, padding='SAME')
+    conv4_3 = Conv2d_Op(conv4_2, name='conv4_3', kh=3, kw=3, n_out=512, dh=1, dw=1)
+    pool4 = Pool2d_Op(conv4_3, name='pool4', kh=2, kw=2, dh=2, dw=2, padding='SAME')
 
-    AddActivationSummary(conv4_2)
+    AddActivationSummary(conv4_3)
     print_activation(pool4)
 
     conv5_1 = Conv2d_Op(pool4, name='conv5_1', kh=3, kw=3, n_out=512, dh=1, dw=1)
     conv5_2 = Conv2d_Op(conv5_1, name='conv5_2', kh=3, kw=3, n_out=512, dh=1, dw=1)
-    pool5 = Pool2d_Op(conv5_2, name='pool5', kh=2, kw=2, dh=2, dw=2, padding='SAME')
+    conv5_3 = Conv2d_Op(conv5_2, name='conv5_3', kh=3, kw=3, n_out=512, dh=1, dw=1)
+    pool5 = Pool2d_Op(conv5_3, name='pool5', kh=2, kw=2, dh=2, dw=2, padding='SAME')
 
-    AddActivationSummary(conv5_2)
+    AddActivationSummary(conv5_3)
     print_activation(pool5)
 
     with tf.name_scope('FeatsReshape'):

@@ -105,3 +105,6 @@ data/
 
 # pyCharm
 .idea/
+
+logs/
+*.csv
