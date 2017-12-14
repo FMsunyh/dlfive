@@ -242,7 +242,7 @@ def TrainModel():
         summary_writer = tf.summary.FileWriter(logdir='logs/alexnet_session')
         summary_writer.add_graph(graph=tf.get_default_graph())
         summary_writer.flush()
-        summary_writer.close()
+        # summary_writer.close()
 
         results_list = list()
         results_list.append(['learning_rate', learning_rate_init,
