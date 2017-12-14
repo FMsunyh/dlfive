@@ -212,10 +212,10 @@ def train():
 
             print('save the graph')
 
-            summary_writer = tf.summary.FileWriter(logdir='logs/vggnet11')
+            summary_writer = tf.summary.FileWriter(logdir='logs/vggnet16')
             summary_writer.add_graph(graph=tf.get_default_graph())
             summary_writer.flush()
-            summary_writer.close()
+            # summary_writer.close()
 
             results_list = list()
             results_list.append(['learning_rate', learning_rate_init,
@@ -287,8 +287,8 @@ def train():
                 images_batch, labels_batch = sess.run([images_test, labels_test])
                 predictions = sess.run([top_K_op],
                                        feed_dict={images_holder: images_batch,
-                                                  labels_holder: labels_batch}
-                                       )
+                                                  labels_holder: labels_batch,
+                                                  keep_prob_holder: keep_prob_value})
                 correct_predicted += np.sum(predictions)
             accuracy_score = correct_predicted * 1.0 / total_exmples
             print("Accuracy on Test Exmples:", accuracy_score)
