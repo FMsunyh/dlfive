@@ -372,6 +372,7 @@ def TrainModel():
         coord.join(threads)
         sess.close()
 
+
 def main(argv=None):
     # maybe_download_and_extract(data_dir=datast_dir)
 
@@ -381,6 +382,7 @@ def main(argv=None):
     tf.gfile.MakeDirs(train_dir)
 
     TrainModel()
+
 
 if __name__ == '__main__':
     tf.app.run(main=main, argv=None)
