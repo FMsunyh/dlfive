@@ -108,3 +108,7 @@ data/
 
 logs/
 *.csv
+
+*.weight
+*.weights
+*.cpkt
