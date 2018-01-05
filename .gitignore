@@ -112,3 +112,4 @@ logs/
 *.weight
 *.weights
 *.cpkt
+/C5_FasterRCNN_KERAS/config/*.pickle

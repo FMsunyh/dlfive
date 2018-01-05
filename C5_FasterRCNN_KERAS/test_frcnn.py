@@ -1,3 +1,10 @@
+#!/usr/bin/env python 
+# -*- coding: utf-8 -*- 
+# @Time : 12/28/2017 4:37 PM 
+# @Author : sunyonghai 
+# @File : test_frcnn.py 
+# @Software: BG_AI
+# =========================================================
 import os
 import cv2
 import numpy as np
@@ -14,19 +21,28 @@ from keras.layers import Input
 from keras.models import Model
 from keras_frcnn import roi_helpers
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 sys.setrecursionlimit(40000)
 
 parser = OptionParser()
 
 parser.add_option("-p", "--path", dest="test_path", help="Path to test data.", default='data/test/')
-parser.add_option("-n", "--num_rois", dest="num_rois", help="Number of ROIs per iteration. Higher means more memory use.", default=32)
-parser.add_option("--config_filename", dest="config_filename", help= "Location to read the metadata related to the training (generated when training).", default="config/config.pickle")
+parser.add_option("-n", "--num_rois", dest="num_rois",
+                  help="Number of ROIs per iteration. Higher means more memory use.", default=32)
+parser.add_option("--config_filename", dest="config_filename",
+                  help="Location to read the metadata related to the training (generated when training).",
+                  default="config/config.pickle")
 
 (options, args) = parser.parse_args()
 
-if not options.test_path:   # if filename is not given
+if not options.test_path:  # if filename is not given
     parser.error('Error: path to test data must be specified. Pass --path to command line')
-
+else:
+    print("test path:", options.test_path)
 
 config_output_filename = options.config_filename
 
@@ -43,14 +59,14 @@ img_path = options.test_path
 
 def format_img(img, C):
     img_min_side = float(C.im_size)
-    (height,width,_) = img.shape
-    
+    (height, width, _) = img.shape
+
     if width <= height:
-        f = img_min_side/width
+        f = img_min_side / width
         new_height = int(f * height)
         new_width = int(img_min_side)
     else:
-        f = img_min_side/height
+        f = img_min_side / height
         new_width = int(f * width)
         new_height = int(img_min_side)
     img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
@@ -81,7 +97,6 @@ if K.image_dim_ordering() == 'th':
 else:
     input_shape_img = (None, None, 3)
     input_shape_features = (None, None, 1024)
-
 
 img_input = Input(shape=input_shape_img)
 roi_input = Input(shape=(C.num_rois, 4))
@@ -130,7 +145,7 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
    img_scaled[:, :, 0] += 123.68
    img_scaled[:, :, 1] += 116.779
    img_scaled[:, :, 2] += 103.939
-    
+
    img_scaled = img_scaled.astype(np.uint8)
 
    if K.image_dim_ordering() == 'tf':
@@ -138,7 +153,7 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
 
    # get the feature maps and output from the RPN
    [Y1, Y2, F] = model_rpn.predict(X)
-    
+
 
    R = roi_helpers.rpn_to_roi(Y1, Y2, C, K.image_dim_ordering(), overlap_thresh=0.7)
 
@@ -198,7 +213,7 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
        bbox = np.array(bboxes[key])
 
        new_boxes, new_probs = roi_helpers.non_max_suppression_fast(bbox, np.array(probs[key]), overlap_thresh=0.5)
-        
+
        for jk in range(new_boxes.shape[0]):
            (x1, y1, x2, y2) = new_boxes[jk,:]
 
@@ -219,5 +234,4 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
    # cv2.imshow('img', img_scaled)
    # cv2.waitKey(0)
    cv2.imwrite('./imgs/{}.png'.format(idx),img_scaled)
-   print('./imgs/{}.png'.format(idx),img_scaled)
    print(all_dets)
