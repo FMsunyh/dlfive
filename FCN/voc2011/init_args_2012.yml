@@ -1,0 +1,31 @@
+image_set_loader:
+  train:
+    image_set: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/ImageSets/Segmentation/train.txt
+    image_dir: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/JPEGImages/
+    label_dir: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/SegmentationClass
+    target_size:
+      - 224
+      - 224
+    image_format: 'jpg'
+    color_mode: 'rgb'
+    label_format: 'png'
+  val:
+    image_set: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/ImageSets/Segmentation/val.txt
+    image_dir: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/JPEGImages/
+    label_dir: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/SegmentationClass
+    target_size:
+      - 224
+      - 224
+    image_format: 'jpg'
+    color_mode: 'rgb'
+    label_format: 'png'
+  test:
+    image_set: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/ImageSets/Segmentation/test.txt
+    image_dir: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/JPEGImages/
+    label_dir: /home/syh/dl/dlfive/C5_FasterRCNN_KERAS/data/VOC2012/SegmentationClass
+    target_size:
+      - 224
+      - 224
+    image_format: 'jpg'
+    color_mode: 'rgb'
+    label_format: 'png'

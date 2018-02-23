@@ -16,7 +16,8 @@ from train import update_config_paths, Solver
 def train():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', default="YOLO_small.ckpt", type=str)
-    parser.add_argument('--data_dir', default="data", type=str)
+    # parser.add_argument('--data_dir', default="data", type=str)
+    parser.add_argument('--data_dir', default="/mnt/hdd/zip_data/syh/data/yolo_tf/data/", type=str)
     parser.add_argument('--threshold', default=0.2, type=float)
     parser.add_argument('--iou_threshold', default=0.5, type=float)
     parser.add_argument('--gpu', default='', type=str)
@@ -25,10 +26,10 @@ def train():
     if args.gpu is not None:
         cfg.GPU = args.gpu
 
-    if args.data_dir != cfg.DATA_PATH:
-        update_config_paths(args.data_dir, args.weights)
+    # if args.data_dir != cfg.DATA_PATH:
+    update_config_paths(args.data_dir, args.weights)
 
-    # os.environ['CUDA_VISIBLE_DEVICES'] = cfg.GPU
+    os.environ['CUDA_VISIBLE_DEVICES'] = cfg.GPU
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"

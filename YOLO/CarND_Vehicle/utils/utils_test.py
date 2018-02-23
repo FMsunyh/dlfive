@@ -55,6 +55,21 @@ class MyTestCase(unittest.TestCase):
 
         print("array test: ", boxes)
 
+    def test_nms(self):
+        dets = np.array([
+            [204, 102, 358, 250, 0.5],
+            [257, 118, 380, 250, 0.7],
+            [280, 135, 400, 250, 0.6],
+            [255, 118, 360, 235, 0.7]])
+
+        thresh = 0.5
+
+        boxes = utils.nms(dets, thresh)
+
+        print("nms test: ", boxes)
+
+        self.assertEqual(3, boxes[0])
+
     def test_non_max_suppression_box(self):
 
         boxes = list()

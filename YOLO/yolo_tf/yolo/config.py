@@ -4,7 +4,8 @@ import os
 # path and dataset parameter
 #
 
-DATA_PATH = 'data'
+# DATA_PATH = 'data'
+DATA_PATH = '/mnt/hdd/zip_data/syh/data/yolo_tf/data/'
 
 PASCAL_PATH = os.path.join(DATA_PATH, 'pascal_voc')
 

@@ -127,8 +127,7 @@ def update_config_paths(data_dir, weights_file):
     cfg.OUTPUT_DIR = os.path.join(cfg.PASCAL_PATH, 'output')
     cfg.WEIGHTS_DIR = os.path.join(cfg.PASCAL_PATH, 'weights')
 
-    cfg.WEIGHTS_FILE = os.path.join(cfg.WEIGHTS_DIR, weights_file)
-
+    cfg.WEIGHTS_FILE = os.path.join(cfg.DATA_PATH, 'weights', weights_file)
 
 def main():
     parser = argparse.ArgumentParser()
