@@ -1,0 +1,1655 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Multi-Column Deep Neural Network on CIFAR-10 dataset</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/our-solarized.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!--<script>-->
+            <!--$(function(file){-->
+                <!--$("#includedContent").load(file);-->
+            <!--});-->
+        <!--</script>-->
+
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+                    <img width="200" height="200" src="./img/Stemma.png" alt="unifi stemma" >
+					<h3 style="color: #586e75;">Università degli Studi di Firenze</h3>
+                    <p>Laurea Magistrale in Ingegneria Informatica</p>
+                    <p><small>Corso di Apprendimento Automatico</small></p>
+                    <br>
+					<h2 style="color: #586e75;">Multi-Column Deep Neural Networks for Image Classification</h2>
+					<p>
+						<small><a href="mailto:matteo.bruni@gmail.com">Matteo Bruni</a> - <a href="mailto:andrearizzo@outlook.com">Andrea Rizzo</a></small>
+					</p>
+				</section>
+
+                <section>
+                    <h2>Contents</h2>
+                    <div style="min-height: 30px; overflow: hidden"></div>
+                    <div class="div-left">
+                        <ul>
+                            <li>Introduction</li>
+                            <li>Deep Learning</li>
+                            <li>Convolutional Neural Networks</li>
+                                <ul>
+                                    <li>Convolutional Layer</li>
+                                    <li>Max-pooling Layer</li>
+                                </ul>
+                            <li>Activation functions</li>
+                            <ul>
+                                <li>Rectified Linear Units (RELU)</li>
+                                <li>Dropout</li>
+                                <li>Maxout</li>
+                            </ul>
+                            <li>Softmax</li>
+                        </ul>
+                    </div>
+
+                    <div class="div-right">
+                        <ul>
+                          <li>Implementation technologies</li>
+                          <li>Dataset</li>
+                          <ul>
+                              <li>Preprocessing: GCN, Toronto, ZCA</li>
+                          </ul>
+                          <li>Architecture</li>
+                          <li>Results</li>
+                        </ul>
+                    </div>
+                </section>
+
+
+
+                <section>
+                    <h2>Multi-column DNN for image classification</h2>
+                    <div class="div-left">
+                        <ul>
+                            <li><b>Detect the image content:</b></li>
+                            <ul>
+                                <li>e.g. cat, doog, airplain, birt, etc...</li>
+                            </ul>
+                            <li><b>Using deep learning algorithms:</b></li>
+                            <ul>
+                                <li>Convolutional Neural Network (CNN)</li>
+                            </ul>
+                            <li><b>Famous benchmarks:</b></li>
+                            <ul>
+                                <li>CIFAR-10 and CIFAR-100;</li>
+                                <li>MNIST: handwritten digits;</li>
+                            </ul>
+                            <li><b>Issues:</b></li>
+                            <ul>
+                                <li>Higher number of layer than shallow Neural Network (NN);</li>
+                                <li>Multiple Deep Neural Network (DNN);</li>
+                                <li>Vanishing gradient problem;</li>
+                                <li>Computational complexity.</li>
+                            </ul>
+                        </ul>
+                    </div>
+                    <div class="div-right" >
+                        <div style="min-height: 50px; overflow: hidden"></div>
+                        <div class="div-img">
+                            <img src="./img/provadnn.png" alt="unifi stemma" >
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Solution proposed</h2>
+                    <div class="div-header">
+                        It is based on <i><b>Multi-column Deep Neural Networks for Image Classification</b></i>
+                        - D. Cireșan, U. Meier and J. Schmidhuber<sup>[1]</sup> of Dalle Molle Institute for Artificial Intelligence (IDSIA).
+                    </div>
+                    <div>
+                        <img src="./img/mcdnn_trasparent.png" alt="unifi stemma" >
+                    </div>
+                    <div class="div-alone">
+                        <ul>
+                            <li>Each DNN is iteratively trained over only one processed dataset;</li>
+                            <li>The feature vectors of all DNN are democratically averaged;</li>
+                            <li>Softmax layer returns the image's predicted class.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Deep learning</h2>
+                        <div class="subtitle">Introduction</div>
+                        <div class="div-header">
+                            <ul>
+                                <li>The visual nervous system proposed by Hubel and Wiesel has a deep hierarchy model<sup>[2]</sup>:</li>
+                            </ul>
+                        </div>
+                        <div class="div-left" style="width: 60%">
+                            <ul>
+                                <li>Suggests that:</li>
+                                <ul>
+                                    <li>Concepts are describe in <b>hierarchical</b> ways;</li>
+                                    <li><b>Multiple levels architecture</b>:</li>
+                                    <ul>
+                                        <li>multiple stages of transformation and representation;</li>
+                                        <li>with increasing level of abstraction;</li>
+                                    </ul>
+                                    <li><b>Distributed representation</b>:</li>
+                                    <ul>
+                                        <li>Each level of abstraction forms a large number of features not mutually exclusive;</li>
+                                    </ul>
+                                    <li>First extract low-level features i.e. low level concepts</li>
+                                    <li>Detect the most frequent patterns i.e. increase abstraction;</li>
+                                    <li>Putting all together to identify categories;</li>
+                                </ul>
+                            </ul>
+                        </div>
+                        <div class="div-right"  style="width: 40%">
+                            <div style="min-height: 80px; overflow: hidden"></div>
+                            <div id="div-img">
+                                <img src="./img/deep_hierarchy_model.png" alt="unifi stemma" >
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <h2>Deep learning</h2>
+                        <div class="subtitle">Milestone</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>1980: Kunihiko Fukushima introduces the <b>Neocognitron</b><sup>[3]</sup>;</li>
+                                <li>1989: Yann LeCun et al. apply backpropagation algorithm to DNN:</li>
+                                <ul>
+                                    <li>too much time to train the network;</li>
+                                </ul>
+                                <li>1991: J. Schmidhuber <b>vanishing gradient problem</b>;</li>
+                                <li>2000: G. Hinton pre-trained one layer at a time with <b>unsupervised algorithm</b>, then using supervised backpropagation;</li>
+                                <li>2010: D. Cireșan by using GPUs, trains a DNN with <b>supervised algorithm</b> even though the vanishing gradient problem;</li>
+                                <li>2011: DNN becomes the <b>state-of-art</b> systems in computer vision;</li>
+                                <li>2012: D. Ciresan at al. train a Multi-Column DNN and on traffic sign recognition benchmark it <b>out-performs humans</b>.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Deep learning</h2>
+                        <div class="subtitle">Sparse representation: advantages</div>
+
+                        <div class="div-alone">
+                            <!--<ul>-->
+                                <!--<li>Sparse representations advantages:</li>-->
+                                <ul>
+                                    <li style="text-align: justify"><b>Information disentangling:</b> </li>
+                                    <ul>
+                                        <li>a <i>dense representation</i> is highly entangled, any change in the input modifies most of
+                                        the entries in the representation vector;</li>
+                                        <li>a <i>sparse representation</i> is robust to small input changes.</li>
+                                    </ul>
+
+                                    <li style="text-align: justify"><b>Efficient variable-size representation:</b> </li>
+                                    <ul>
+                                        <li>different inputs may contain different amounts of information;</li>
+                                        <li>varying the number of active neurons allows a model to control the effective
+                                    dimensionality of the representation for a given input and the required precision;</li>
+                                    </ul>
+
+                                    <li style="text-align: justify"><b>Linear separability:</b> </li>
+                                    <ul>
+                                        <li>sparse representations are also more likely to be linearly separable.</li>
+                                    </ul>
+                                    <li style="text-align: justify"><b> Distributed but sparse:</b></li>
+                                    <ul>
+                                        <li>dense distributed representations are the richest representations, being potentially exponentially more efficient than purely local ones (Bengio, 2009);</li>
+                                        <li>sparse representations’ efficiency
+                                    is still exponentially greater, with the power of the exponent being the number
+                                    of non-zero features. They may represent a good trade-off with respect to the above criteria.</li>
+                                    </ul>
+
+
+                                </ul>
+                            <!--</ul>-->
+
+                        </div>
+                    </section>
+
+                    <!--<section>-->
+                        <!--<h2>Deep learning</h2>-->
+                        <!--<div class="subtitle">Sparse representation: advantages</div>-->
+
+                        <!--<div class="div-alone">-->
+                            <!--<ul>-->
+                                <!--<li>Sparse representations advantages:</li>-->
+                                <!--<ul>-->
+                                    <!--<li style="text-align: justify"><b>Linear separability:</b> </li>-->
+                                    <!--<ul>-->
+                                        <!--<li>sparse representations are also more likely to be linearly separable.</li>-->
+                                    <!--</ul>-->
+                                    <!--<li style="text-align: justify"><b> Distributed but sparse:</b></li>-->
+                                    <!--<ul>-->
+                                        <!--<li>dense distributed representations are the richest representations, being potentially exponentially more efficient than purely local ones (Bengio, 2009);</li>-->
+                                        <!--<li>sparse representations’ efficiency-->
+                                    <!--is still exponentially greater, with the power of the exponent being the number-->
+                                    <!--of non-zero features. They may represent a good trade-off with respect to the above criteria.</li>-->
+                                    <!--</ul>-->
+                                <!--</ul>-->
+                            <!--</ul>-->
+                        <!--</div>-->
+                    <!--</section>-->
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Convolutional Neural Networks (CNN)</h2>
+                        <div class="subtitle">Introduction</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>CNNs are an implementation of deep learning architecture:</li>
+                                <ul>
+                                    <li>are variations of Multi-Layer Perceptrons (MLP);</li>
+                                    <li>each layer has a topological structure, i.e. each unit as a 2D position that corresponds to an image's pixel;</li>
+                                </ul>
+                                <li>CNN's design:</li>
+                                <ul>
+                                    <li><b>Convolutional layer</b>: implements the convolution operation as in image processing;</li>
+                                    <li><b>Max-pooling layer</b>: implements a form of non-linear down-sampling;</li>
+                                    <li><b>Fully connected layer</b>: the upper-layer and corresponds to a traditional MLP.</li>
+                                </ul>
+                            </ul>
+                        </div>
+                        <div>
+                            <img src="./img/LeNet-trasparent.png">
+                            <p class="img-note"><i>Figure: Convolutional Neural Network: 1x48x48-10C2-MP2-16C5-MP2-16C13-180N-7N.</i></p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Convolutional Neural Networks (CNN)</h2>
+                        <div class="subtitle">Convolutional layer</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>Implements the convolution operation:</li>
+                                <ul>
+                                    <li>A <b>linear filter</b> $W \in \mathbb{R}^{m \times m}$ and bias $b$ is applied to the input image or to a feature map $X \in \mathbb{R}^{N \times N}$. Mathematically:</li>
+                                    <div class="equation">$c_{ij}=\sum\limits_{k=0}^{m-1}\sum\limits_{l=0}^{m-1}x_{(i+k)(j+l)}w_{kl} + b$</div>
+                                    <ul>
+                                        <li><b>Sparse connectivity</b> i.e. only a subset of units in a feature map are used;</li>
+                                    </ul>
+                                    <li>After a <b>non-linear function</b> $\sigma$ is applied.</li>
+                                    <li>The ouput image $Y = \sigma(C)$ is called <b>feature map</b>;</li>
+                                    <ul>
+                                        <li>by appling $k$ different filters we obtain $k$ feature maps: $\{Y^{s}\}_{s=1}^{k}$.</li>
+                                        <li>$Y \in \mathbb{R}^{(N-m+1) \times (N-m+1)}$</li>
+                                    </ul>
+                                </ul>
+                                <li>We use $k\text{C}m$ to indicate a <b>C-Layer</b> that applies $k$ filters of $m\times m$ dimension to a feature map ;</li>
+                            </ul>
+                        </div>
+                        <div style="padding-top: 5px">
+                            <div class="div-left">
+                                <img src="./img/cnn_operation.png" width="70%">
+                                <p class="img-note"><i>Figure: C-Layer operation.</i></p>
+                            </div>
+
+                            <div class="div-right">
+                                <img src="./img/convolution.gif" width="70%">
+                                <p class="img-note"><i>Figure: convolution operation.</i></p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Convolutional Neural Networks (CNN)</h2>
+                        <div class="subtitle">Convolutional layer: shared weights</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>The linear filter $W$ is applied across the entire input feature map;</li>
+                                <ul>
+                                    <li>The units share the same weights $w_{ij}$</li>
+                                </ul>
+                                <li>Advantage of <b>weight sharing</b>:</li>
+                                <ul>
+                                    <li>The features can be detected regardless of their position;</li>
+                                    <li>Increased of learning efficiency by reducing the number of free parameters;</li>
+                                    <li>CNNs achieve better generalization.</li>
+                                </ul>
+                            </ul>
+                        </div>
+                        <div >
+                            <img style="width: 35%" src="./img/cnn_shared_weights.png">
+                            <p class="img-note"><i>Figure: the weights with the same color are shared.</i></p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Convolutional Neural Networks (CNN)</h2>
+                        <div class="subtitle">Max-pooling layer</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>M-Layer implements a form of non-linear <b>down-sampling</b>;</li>
+                                <li>How <b>M-Layer</b> works:</li>
+                                <ul>
+                                    <li>The M-Layer receives as input a set of feature maps $I=\{I_j\}$ which is the output of C-Layer that precedes it;</li>
+                                    <li>Each feature map $I_j$ is partitioned into a set of non-overlapping rectangles $R_{i}^{(j)} \in \mathbb{R}^{k \times k}$;</li>
+                                    <li>For each rectangle $R_{i}^{(j)}$ the maximum value are taken which form the output feature map $O_j$;</li>
+                                    <li>The output of M-Layer is a set of feature maps $O=\{O_j\}$;</li>
+                                </ul>
+                                <li>If the input feature maps $I_j \in \mathbb{R}^{N \times N}$ then the output feature maps $O_j \in \mathbb{R}^{\frac{N}{k} \times \frac{N}{k}} \;$ :</li>
+                                <ul>
+                                    <li>as each $k \times k$ sub-region is reduced to just a single value via the max function.</li>
+                                </ul>
+                            </ul>
+                        </div>
+                                               <div >
+                            <br>
+                            <img style="width: 40%" src="./img/max_pool.gif">
+                            <p class="img-note"><i>Figure: Max-pooling operation.</i></p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Convolutional Neural Networks (CNN)</h2>
+                        <div class="subtitle">Max-pooling layer: advantage</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>Advantage of M-Layer:</li>
+                                <ul>
+                                    <li>reduces the computational complexity for the layers above;</li>
+                                    <li>provides a form of translation invariance:</li>
+                                    <ul>
+                                        <li>If we consider the neighbors of a feature map's unit the 8-connected units;</li>
+                                        <li>and max-pooling is done over a $2 \times 2$ region, $3$ out of these $8$ possible configurations will produce exactly the same output at the C-layer above;</li>
+                                    </ul>
+                                </ul>
+                            </ul>
+                        </div>
+                    </section>
+
+                </section>
+
+                <section>
+
+                    <section>
+                        <h2>Rectified Linear Units (ReLU)</h2>
+                        <div class="subtitle">ReLU function</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>Rectified Linear units are a drop in replacement for the traditional nonlinear activation functions:</li>
+                            </ul>
+
+                            <div class="equation">
+                                $ y = max (0 , b + \sum\limits_{i=1}^k x_i  w_i) $ <br>
+                            </div>
+
+                            <ul>
+                                <li>ReLU units are <b>more biologically plausible</b> then the other activation functions;</li>
+                                <ul>
+                                    <li>since they model the biological neuron's responses in their area of operation.</li>
+                                </ul>
+                                <li>While $sigmoid$ and $tanh$ activation functions are biologically <i>implausible</i>.</li>
+                            </ul>
+                            <br>
+                        </div>
+
+                        <div>
+                            <img src="./img/synapse_vs_sigmoid_trasp.png" alt="unifi stemma">
+                            <p class="img-note">Figure: left: Firing of a neuron from biological data. Right: traditional activation functions.</p>
+                        </div>
+
+                    </section>
+
+                    <section>
+                        <h2>Rectified Linear Units (ReLU)</h2>
+                        <div class="subtitle">ReLU derivative</div>
+
+                        <div style="min-height: 20px; overflow: hidden"></div>
+
+                        <div class="div-alone">
+                            <div class="div-left">
+                            <ul>
+                                <li>ReLU derivative:</li>
+                                <ul>
+                                    <li>is not fully differentiable (not at $0$)</li>
+                                    <li>can only take two values, $0$ or $1$.</li>
+                                </ul>
+                            </ul>
+
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="div-right">
+                            <ul>
+                               <li>Compared to the logistic sigmoid neuron:</li>
+                                <ul>
+                                    <li>it is much more efficient to compute (both its value and its partial derivatives)</li>
+                                    <li>considerably speeds up training.</li>
+                                    <li>enables much larger network implementations.</li>
+                                </ul>
+                            </ul>
+                            <!--<div style="min-height: 50px; overflow: hidden"></div>-->
+
+                        </div>
+
+                        <div style="min-height: 10px; overflow: hidden; width: 100%"></div>
+
+                        <div style="display: inline-flex; width: 100%">
+                            <div style="width: 50%">
+                                <img src="./img/relu_trasp.png" width="320" alt="relu">
+                                <p class="img-note">Figure: ReLu vs Softplus activation function.</p>
+                            </div>
+
+                            <div style="width: 50%">
+                                <img src="./img/sigmoidederivata.png" width="360" alt="relu">
+                                <p class="img-note">Figure: Sigmoid function derivative.</p>
+                            </div>
+
+
+                        </div>
+
+
+                    </section>
+
+                    <section>
+                        <h2>Rectified Linear Units (ReLU)</h2>
+                        <div class="subtitle">Potential problem</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>Potential problem by using ReLU activation function:</li>
+                                <ul>
+                                    <li>hard saturation at $0$ may hurt optimization by blocking gradient back-propagation.
+                                        To evaluate the potential impact of this effect we also investigate the <i>soft-plus activation</i>:
+                                        <div class="equation">
+                                            $softplus(x) = log(1+ e^x)$
+                                        </div>
+                                        which is a smooth version of the rectifying non-linearity.
+                                    </li>
+                                    <li>We lose the exact sparsity, but may hope to gain easier training. However, experimental results tend to contradict that hypothesis, suggesting
+                                        that hard zeros can actually help supervised training.</li>
+                                </ul>
+
+
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Rectified Linear Units (ReLU)</h2>
+                        <div class="subtitle">Advantages</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>The Advantages to use ReLU activation function are:</li>
+                                <ul>
+                                    <li><b>Biological plausibility:</b> one-sided, compared to the antisymmetry of tanh;</li>
+                                    <li><b>Sparse activation:</b> e.g. in a randomly initialized networks, only about 50% of hidden units is activated (having a non-zero output);</li>
+                                    <li><b>Efficient gradient propagation:</b> no vanishing gradient problem or exploding effect;</li>
+                                    <li><b>Efficient computation:</b> only comparison, addition and multiplication.</li>
+                                </ul>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Dropout</h2>
+                        <div class="subtitle">How to improve a neural network</div>
+
+                        <div class="div-left">
+                            <br>
+                            <ul>
+                                <li>Train many models and average the models' predictions:</li>
+                                <ul>
+                                    <li>reduce test error and overfitting;</li>
+                                    <li>too expensive for big NN and that already take several days to train.</li>
+                                </ul>
+                                <li><b>Dropout</b> is a more efficient solution<sup>[4]</sup>. It provides:</li>
+                                <ul>
+                                    <li>an inexpensive and simple means of both training a large ensemble of models;</li>
+                                </ul>
+                            </ul>
+                        </div>
+
+                        <div class="div-right">
+                            <img src="./img/mcdnn_dropout.png" width="80%">
+                        </div>
+
+                    </section>
+                    <section>
+                        <h2>Dropout</h2>
+                        <div class="subtitle">How Dropout works</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>Given a feedforward architecture:</li>
+                                <ul>
+                                    <li>Input: $v \, \in \mathbb{R}^{m}$;</li>
+                                    <li>Hidden layers: $ \, h = \{h^{(1)}, \dots, h^{(l)} \}$;</li>
+                                    <li>Output: $\, y \in \mathbb{R}^{n}$;</li>
+                                </ul>
+                                <li><b>Dropout</b> trains a set of models, each of which:</li>
+                                <ul>
+                                    <li>contains a subset of the variables in both $v$ and $h$;</li>
+                                    <li>each model uses the same set of parameters $\theta$:</li>
+                                        <ul>
+                                            <li>to parameterize a family of distributions $p(y | v; \theta, \mu)$;</li>
+                                            <li>where $\mu \in M$ is a binary mask determining which variables to include in the model.</li>
+                                        </ul>
+                                </ul>
+                                <li>On each presentation of a training example:</li>
+                                <ul>
+                                    <li>a different sub-model is obtained by randomly sampling $\mu$;</li>
+                                    <li>the sub-model is trained by following the gradient of $log \, p(y | v; \theta, \mu)$;</li>
+                                </ul>
+
+                                <li>Each model is trained for only one step and all the models share the parameters $\theta$.</li>
+                            </ul>
+                            <br><br>
+                            <b>Note</b>: each update must have a large effect so that it makes the sub-model induced by that $\mu$ fit the current input $v$ well.
+
+                        </div>
+                    </section>
+
+                    <!--<section>-->
+                        <!--<h2>Dropout</h2>-->
+                        <!--<div class="subtitle">How Dropout works</div>-->
+
+                        <!--<div class="div-alone">-->
+                            <!--<ul>-->
+                                <!--<li>On each presentation of a training example:</li>-->
+                                <!--<ul>-->
+                                    <!--<li>a different sub-model is obtained by randomly sampling $\mu$;</li>-->
+                                    <!--<li>the sub-model is trained by following the gradient of $log \, p(y | v; \theta, \mu)$;</li>-->
+                                <!--</ul>-->
+
+                                <!--<li>Each model is trained for only one step and all the models share the parameters $\theta$.</li>-->
+                            <!--</ul>-->
+                            <!--<br><br>-->
+                            <!--<b>Note</b>: each update must have a large effect so that it makes the sub-model induced by that $\mu$ fit the current input $v$ well.-->
+                        <!--</div>-->
+                    <!--</section>-->
+
+                    <section>
+                        <h2>Dropout</h2>
+                        <div class="subtitle">Model prediction</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>Model prediction is obtained by averaging together all the sub-models prediction.</li>
+                                <li>By using Dropout the number of models trained is exponential:</li>
+                                <ul>
+                                    <li>when $p(y | v;\theta) = softmax(v^{T}W+b)$</li>
+                                    <li>the predictive distribution defined by renormalizing the geometric mean of $p(y | v;\theta, \mu)$ over $M$ is simply given by:</li>
+                                    <br>
+                                        <p align="center"><b>$softmax(v^{T}\frac{W}{2}+b)$</b></p>
+
+                                </ul>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Maxout</h2>
+                        <div class="subtitle">Introduction</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li><b>Maxout</b> (J. Goodfellow et al. 2013) is so named because its output is the max of a set of inputs:
+                                    <ul>
+                                        <li>it is a natural companion to dropout;</li>
+                                    </ul>
+                                <li>Maxout model introduce a new type of activation function called <b>maxout unit</b><sup>[6]</sup>:</li>
+                                    <ul>
+                                        <li>Given an input $x \in \mathbb{R^d}$, the maxout layer implements the function:</li>
+                                    </ul>
+                            </ul>
+                            <div class="equation"> $h_{i}(x) = \max\limits_{j \in [1, k]}^{} z_{i}^{(j)}$ </div>
+                            <p style="padding-left:3em" >where:</p>
+                            <div class="equation">
+                                $z_{i}^{(j)} = x^{T}W_{i}^{(j)} + b_{i}^{(j)}$
+                            </div>
+                            <p style="padding-left:3em" >and:</p>
+                            <div class="equation">
+                                $W \in \mathbb{R}^{d \times m \times k} \text{and  } b \in \mathbb{R}^{m \times k}$
+                            </div>
+                            <ul>
+                                <ul>
+                                    <ul>
+                                        <li>$m$: number of hidden units;</li>
+                                        <li>$d$: size of input vector;</li>
+                                        <li>$k$: number of linear models.</li>
+                                    </ul>
+                                </ul>
+                            </ul>
+
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Maxout</h2>
+                        <div class="subtitle">Universal approximator</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li><b>Theorem (<i>universal approximator</i>)</b>: any continuous function $f$ can be approximated arbitrarily
+                                    well on a compact domain $C ⊂ \mathbb{R}^{n}$ by a maxout network with two maxout hidden units.</li>
+
+                                <div style="margin-left: 3em; margin-top: 1em">
+                                    <b>Proof</b>:
+                                    <ul>
+                                        <li><i>(Wang, 2004)</i> any continuous function can be expressed as a difference of $2$ convex functions:</li>
+                                    </ul>
+                                </div>
+                                <div class="equation">
+                                    $g(x)=h_{1}(x)-h_{2}(x)$
+                                </div>
+                                <div style="margin-left: 3em;">
+                                    <ul>
+                                        <li><i>(Stone-Weierstrass)</i> any continuous function can be approximated by a piecewise linear function</li>
+                                    </ul>
+                                </div>
+                                <div class="equation">
+                                    $|f(x)-g(x)|< \epsilon$
+                                </div>
+                            </ul>
+                        </div>
+                        <div style="margin-top: 20px">
+                            <img src="./img/maxout.png" alt="unifi stemma" width="60%">
+                            <p class="img-note">Figure: examples of approximation with maxout.</p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Maxout</h2>
+                        <div class="subtitle">Activation function</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>Maxout learn the activation function:</li>
+                                <ul>
+                                    <li>with $k=2$ (number of maxout unit) the activation function can be:</li>
+                                    <ul>
+                                        <li>ReLU function;</li>
+                                        <li>Absolute function;</li>
+                                    </ul>
+                                    <li>with $k=5$ the activation function can be a <i>quadratic</i> function.</li>
+                                </ul>
+                            </ul>
+                        </div>
+                        <div style="margin-top: 40px">
+                            <img src="./img/maxout_net.png" alt="unifi stemma" width="50%">
+                            <p class="img-note">Figure: example of maxout net with $2$ hidden units.</p>
+                        </div>
+                    </section>
+
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Softmax</h2>
+                        <div class="subtitle">Softmax layer</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li><b>Softmax regression</b> is a generalization of logistic regression:</li>
+                                <ul>
+                                    <li>where we want to handle multiple classes;</li>
+                                </ul>
+                                <li>In logistic regression the labels are binary: $y^{(i)} \in \{0,1\}$ ;</li>
+                                <li>Softmax regression allows us to handle: $y^{(i)} \in \{1,\ldots,K\}$ :</li>
+                                <ul>
+                                    <li>where $K$ is the number of classes;</li>
+                                </ul>
+                                <li>Given a training set: $\{ (x^{(1)}, y^{(1)}), \ldots, (x^{(m)}, y^{(m)}) \}$ of $m$ labeled examples, where the input features are $x^{(i)} \in \mathbb{R}^n$.</li>
+                                <ul>
+                                    <li>with logistic regression the hypotesis took the form:</li>
+                                </ul>
+                            </ul>
+
+                            <div class="equation">
+                                $h_\theta(x) = \frac{1}{1+\exp(-\theta^\top x)}$
+                            </div>
+
+                            <!--<br>-->
+                             <!--<div align="center" style="margin-top: 1em; margin-bottom: 1em">$h_\theta(x) = \frac{1}{1+\exp(-\theta^\top x)}$</div>-->
+                            <ul>
+                                <ul>
+                                    <li>where $\theta^\top$ are the parameters to optimize and $ 0 \leq h_\theta(x) \leq 1$.</li>
+                                    <ul>
+                                        <li>i.e. $h_\theta(x) = P(y=1|x;\theta)$</li>
+                                    </ul>
+                                </ul>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Softmax</h2>
+                        <div class="subtitle">Softmax layer</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>Given a test input $x$, we want our hypothesis to estimate the probability that $P(y=k | x)$ for each value of $k = 1 \ldots, K$:</li>
+                                <ul>
+                                    <li>i.e., we want to estimate the probability of the class label taking on each of the $K$ different possible values.</li>
+                                </ul>
+                                <li>Thus, our hypothesis will output a $K$-dimensional vector (whose elements sum to 1) giving us our $K$ estimated probabilities:</li>
+                                    <ul>
+                                        <li>Concretely, our hypothesis $h_{\theta}(x)$ takes the form:</li>
+                                    </ul>
+                            </ul>
+                            <div class="equation" style="margin-top: 1em; margin-bottom: 1em">
+                               $
+                                    \begin{align}
+                                    h_\theta(x) =
+                                    \begin{bmatrix}
+                                    P(y = 1 | x; \theta) \\
+                                    P(y = 2 | x; \theta) \\
+                                    \vdots \\
+                                    P(y = K | x; \theta)
+                                    \end{bmatrix}
+                                    =
+                                    \frac{1}{ \sum_{j=1}^{K}{\exp(\theta^{(j)\top} x) }}
+                                    \begin{bmatrix}
+                                    \exp(\theta^{(1)\top} x ) \\
+                                    \exp(\theta^{(2)\top} x ) \\
+                                    \vdots \\
+                                    \exp(\theta^{(K)\top} x ) \\
+                                    \end{bmatrix}
+                                    \end{align}
+                                    $
+                            </div>
+
+                            <ul>
+                                <ul>
+                                    <li>where $\theta^{(1)}, \theta^{(2)}, \ldots, \theta^{(K)} \in \mathbb{R}^{n}$ are the parameters of our model:</li>
+                                        <ul>
+                                            <li><i>Notice</i> that the term $\frac{1}{ \sum_{j=1}^{K}{\exp(\theta^{(j)\top} x) } } $ normalizes the distribution, so that it sums to one.</li>
+                                        </ul>
+                                </ul>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Cost Function</h2>
+                        <div class="subtitle">Softmax cost</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>The <b>cost function</b> used in softmax regression is the follow:</li>
+                            </ul>
+                            <div class="equation" style="margin-top: 1em; margin-bottom: 1em">
+                                $ J(\theta) = - \left[ \sum_{i=1}^{m} \sum_{k=1}^{K}  1\left\{y^{(i)} = k\right\} \log \frac{\exp(\theta^{(k)\top} x^{(i)})}{\sum_{j=1}^K \exp(\theta^{(j)\top} x^{(i)})}\right] $
+                            </div>
+                            <ul>
+                                <ul>
+                                    <li>that is a generalization of logistic regression cost function:</li>
+                                </ul>
+                            </ul>
+                            <div class="equation" style="margin-top: 1em; margin-bottom: 1em">
+                                $J(\theta) = - \left[ \sum_{i=1}^m   (1-y^{(i)}) \log (1-h_\theta(x^{(i)})) + y^{(i)} \log h_\theta(x^{(i)}) \right]
+= - \left[ \sum_{i=1}^{m} \sum_{k=0}^{1} 1\left\{y^{(i)} = k\right\} \log P(y^{(i)} = k | x^{(i)} ; \theta) \right]$
+                            </div>
+
+                            <ul>
+                                <ul>
+                                    <li>where we sum over the $K$ different possible values of the class label.</li>
+                                </ul>
+                                <li>To obtain the parameters $\theta$ we'll resort to an iterative optimization algorithm using the gradient:</li>
+                            </ul>
+
+                            <div class="equation" style="margin-top: 1em; margin-bottom: 1em">
+$ \nabla_{\theta^{(k)}} J(\theta) = - \sum_{i=1}^{m}{ \left[ x^{(i)} \left( 1\{ y^{(i)} = k\}  - P(y^{(i)} = k | x^{(i)}; \theta) \right) \right]  } $
+                            </div>
+
+                        </div>
+                    </section>
+
+                </section>
+
+                <section>
+
+                    <section>
+                        <h2>Optimization method</h2>
+                        <div class="subtitle">Gradient Descent methods</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>The Gradient Descent (GD) method is used to optimize the cost function:</li>
+                                <ul>
+                                    <li>called Batch GD which use the full training set to compute the next update to parameters at each iteration;</li>
+                                    <li>in practice computing the cost and gradient for the entire training set can be:
+                                        <ul>
+                                            <li>very slow;</li>
+                                            <li>sometimes intractable on a single machine if the dataset is too big to fit in main memory.</li>
+                                        </ul>
+                                </ul>
+                                <li><b>Stochastic Gradient Descent (SGD)</b> addresses both of these issues by following the negative gradient of the objective
+                                    after seeing:
+                                <ul>
+                                    <li>only a single or a few training examples: <b>online</b> setting;</li>
+                                    <li>a small batch of examples e.g. $128$, $256$: <b>Minibatch SGD</b>.</li>
+                                </ul>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Optimization method</h2>
+                        <div class="subtitle">Minibatch Stochastic Gradient Descent</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>The standard gradient descent algorithm updates the parameters $\theta$ of the objective $J(\theta)$ as:</li>
+                            </ul>
+                            <div class="equation" style="margin-top: 1em; margin-bottom: 1em">
+                                $\theta = \theta - \alpha \nabla_\theta E[J(\theta)]$
+                            </div>
+
+                            <ul>
+                                <ul>
+                                    <li>where the expectation in the above equation is approximated by evaluating the cost and gradient over the full training set.</li>
+                                </ul>
+                                <li>Minibatch SGD update and computes the gradient of the parameters using a small batch of examples;</li>
+                                <ul>
+                                    <li>the new update is given by:</li>
+                                </ul>
+                            </ul>
+
+                            <div class="equation" style="margin-top: 1em; margin-bottom: 1em">
+                                $\theta = \theta - \alpha \nabla_\theta J(\theta; x^{b},y^{b})$
+                            </div>
+
+                            <ul>
+                                <ul>
+                                    <li>where $\{x^{b}, y^{b}\}$ is the $b$-th subset of training set and $\alpha$ is the learning rate.</li>
+                                </ul>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Optimization method</h2>
+                        <div class="subtitle">Momentum</div>
+                        <div class="div-alone">
+                            <ul>
+                                <li>The objective has the form of a long shallow ravine leading to the optimum and steep walls on the sides, standard SGD will tend to oscillate across the narrow ravine since the negative gradient will point down one of the steep sides rather than along the ravine towards the optimum;</li>
+                                <li><b>Momentum</b> is one method for pushing the objective more quickly along the shallow ravine<sup>[7]</sup>;</li>
+                                <ul>
+                                    <li>The momentum update is given by:</li>
+                                </ul>
+                            </ul>
+                            <div class="equation" style="margin-top: 1em; margin-bottom: 1em">
+                                $\theta^{k+1} = \theta^{k} -  \Delta \theta^{k+1}$
+                            </div>
+                            <div class="equation" style="margin-top: 1em; margin-bottom: 1em">
+                                $\Delta \theta^{k+1} = \gamma \Delta \theta^{k} + \alpha \nabla_{\theta} J(\theta; x^{(i)},y^{(i)})$
+                            </div>
+
+                            <ul>
+                                <ul>
+                                    <li>where $\gamma$ is the <i>momentum</i> and $\alpha$ the learning rate.</li>
+                                </ul>
+                            </ul>
+
+                        </div>
+                    </section>
+
+                </section>
+
+                <section>
+                    <h2>Implementation technologies</h2>
+                    <div class="subtitle">Tools</div>
+                    <br>
+                    <div class="div-left">
+                        <ul>
+                            <li>Dataset: CIFAR-10</li>
+                            <li>Python:</li>
+                            <ul>
+                                <li>Pylearn2</li>
+                                <li>Theano</li>
+                                <li>Nvidia CUDA</li>
+                            </ul>
+                            <li>Pycharm</li>
+                            <li>PC Desktop:</li>
+                            <ul>
+                                <li>CPU: Intel Core i5-3570k</li>
+                                <li>RAM: 8 GB DDR3</li>
+                                <li>GPU: NVIDIA GeForce GTX 670</li>
+                                <ul>
+                                    <li>CUDA core: 1344</li>
+                                    <li>RAM: 2048 MB (256-bit GDDR5)</li>
+                                </ul>
+                            </ul>
+                        </ul>
+                    </div>
+                    <div class="div-right">
+                        <img src="./img/python-logo.png" width="27%">
+                        <br>
+                        <img src="./img/theano-logo.png" width="27%">
+                        <br>
+                        <img src="./img/pycharm-logo.png"width="55%">
+                        <br>
+                        <img src="./img/CUDA-logo.png" width="27%">
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Multi-Column Convolutional Neural Network</h2>
+                    <div class="subtitle">Architecture</div>
+                    <div class="div-alone">
+                        <ul>
+                            <li>We will go through the implementation details:</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <img src="./img/mcdnn_trasparent.png" alt="unifi stemma" >
+                        <div class="img-note">Figure: Multi-Column Deep Neural Network architecture.</div>
+                    </div>
+
+                    <div class="div-alone">
+                        <ul>
+                            <li>The single DNNs are trained separately.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <img src="./img/dnn_training_trasparent.png" width="57%">
+                        <div class="img-note">Figure: single DNN training.</div>
+                    </div>
+
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Dataset</h2>
+                        <div class="subtitle">Cifar-10</div>
+                        <br>
+                        <div class="div-left">
+                            <br>
+                            <br>
+                            <ul>
+                                <li>The CIFAR-10 dataset is a famous benchmark:</li>
+                                <ul>
+                                    <li>consists of $60000$ $32\times 32$ colour images in $10$ classes, with $6000$ images per class;</li>
+                                    <li>there are $50000$ training images and $10000$ test images:</li>
+                                </ul>
+                            </ul>
+                        </div>
+
+                        <div class="div-right">
+                            <br>
+                            <img  width="75%" src="./img/cifar10.png" alt="cifar10">
+                            <div class="img-note">Cifar-10 dataset.</div>
+                        </div>
+
+                    </section>
+
+                    <section>
+                        <h2>Dataset</h2>
+                        <div class="subtitle">Preprocessing</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>Operations that give as a result a modified image with the same dimensions as the
+                                    original image (e.g., contrast enhancement and noise reduction).</li>
+                                <li>In order to <b>enhance the performance</b> of the MCDNN, the dataset is preprocessed in $3$ different ways:</li>
+                                <ul>
+                                    <li><i>Global Contrast Normalization (GCN)</i>;</li>
+                                    <li><i>Toronto preprocessing</i>;</li>
+                                    <li><i>ZCA Whitening</i>.</li>
+                                </ul>
+                                <li>Each preprocessed dataset is given as input to a single DNN;</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Dataset</h2>
+                        <div class="subtitle">GCN and Toronto preprocessing</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>In image processing, normalization is a process that changes the range of pixel intensity
+                        values.</li>
+                                <li><b>Global Contrast Normalization</b>:</li>
+                                <ul>
+                                    <li>each training sample is normalized by subtracting the per-example mean across pixels;</li>
+                                    <li>and then normalizes by either the vector norm or the standard deviation;</li>
+                                </ul>
+                                <li><b>Toronto preprocessing</b>:</li>
+                                <ul>
+                                    <li>each training sample is normalized by subtracting the per-pixel mean across examples;</li>
+                                    <li>and then normalizes by the maximum intensity value i.e. $255$;</li>
+                                    <ul>
+                                        <li>if the test is used the mean must be computed across the training set.</li>
+                                    </ul>
+                                </ul>
+                            </ul>
+                        </div>
+
+                    </section>
+
+                    <section>
+                        <h2>Dataset</h2>
+                        <div class="subtitle">Zero Components Analysis (ZCA)</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li><b>Whitening</b> is an important pre-processing step for many algorithms.</li>
+                                <li>The images contain redundant data:</li>
+                                <ul>
+                                    <li>the values of adjacent pixels in an image are highly correlated.</li>
+                                </ul>
+                                <li>The <b>goal</b> of whitening is to make the input <b>less redundant</b>:</li>
+                                <ul>
+                                    <li><i>(i)</i> the features are less correlated with each other;</li>
+                                    <li><i>(ii)</i> the features all have the same variance.</li>
+                                </ul>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Dataset</h2>
+                        <div class="subtitle">Zero Components Analysis (ZCA): method</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>The images $32 \times 32$ are flattened in $n=1024$ dimensional vectors;</li>
+                                <ul>
+                                    <li>the dataset can be stored in a matrix $X \in \mathbb{R}^{d\times n}$;</li>
+                                </ul>
+                                <li>GCN is applied in order to have mean zero. </li> <!--Therefore the covariance matris is given by:</li>-->
+                            </ul>
+
+                            <!--<div class="equation">-->
+                                <!--$\Sigma = \frac{1}{n-1} XX^\top$-->
+                            <!--</div>-->
+
+                            <ul>
+                                <!--<li>recalling that $\sigma_{ii}$ elements of $\Sigma$ matrix are the variances and $\sigma_{ij} (i \neq j)$ are the covariance.</li>-->
+                                <li>To achive <i>(i)</i>, we search a linear transformation $W$ such that:</li>
+                            </ul>
+
+                            <div class="equation">
+                                $Y = WX$
+                            </div>
+
+                            <ul>
+                                <li>where $W$ is the decorrelating matrix, then $YY^{\top}$ must be diagonal i.e. uncorrelated. Therefore $W$ shall be such that</li>
+                            </ul>
+
+                            <div class="equation">
+                                $YY^{\top} = (n-1)I$
+                            </div>
+
+                            <ul>
+                                i.e. $W$ make the covariance matrix of the transformed data matrix equal to the identity <i>(ii)</i>.
+                                <li>Let $W$ a symmetric matrix i.e. $W = W^{\top}$:</li>
+                                <!--<li>we can find $W$:</li>-->
+                            </ul>
+
+                            <div class="equation">
+                                <!--$-->
+                                <!--\begin{split}-->
+                                <!--YY^T & = (n-1)I \\-->
+                                <!--WXX^TW^T & = (n-1)I \\-->
+                                <!--W^TWXX^TW^T &= (n-1)W^T \\-->
+                                <!--W^2XX^TW^T &= (n-1)W^T \\-->
+                                <!--W^2XX^T &= (n-1)I \\-->
+                                <!--W^2 &= (n-1)(XX^T)^{-1} \\-->
+                                $W = \sqrt{n-1}(XX^T)^{-\frac{1}{2}} $
+                                <!--\end{split}$-->
+                            </div>
+
+
+                            <ul>
+                                <li>Since $XX^{\top}$ is symmetric it's hence orthogonally diagonalizable, we can write:</li>
+                            </ul>
+
+                            <div class="equation">
+                                $(XX^T)^{-\frac{1}{2}} = PD^{-\frac{1}{2}}P^T $
+                            </div>
+
+                            <ul>where $P$ is a orthogonal matrix and $D$ is a diagonal matrix.</ul>
+
+                            <ul>
+                                <li>$W$ is called a <b>whitening matrix</b>, and is referred to as the <i>Zero Components Analysis</i> (ZCA) solution to the equation:</li>
+                            </ul>
+
+                            <div class="equation">
+                                $YY^T = diagonal$
+                            </div>
+
+
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Dataset</h2>
+                        <div class="subtitle">Zero Components Analysis (ZCA): advantages</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>ZCA-whitened images still <b>resemble</b> normal images:</li>
+                                <ul>
+                                    <li>whereas PCA-whitened ones look nothing.</li>
+                                </ul>
+                                <li>This is <b>important</b> for algorithms like CNN, which treat neighbouring pixels together:</li>
+                                <ul>
+                                    <li>so greatly rely on the local properties of natural images</li>
+                                </ul>
+                            </ul>
+                        </div>
+
+                        <br>
+
+                        <div class="div-left">
+                            <img src="./img/pre_zca.png" alt="unifi stemma" >
+                            <div class="img-note">Figure: before ZCA.</div>
+                        </div>
+
+                        <div class="div-right">
+                            <img src="./img/after_zca.png" alt="unifi stemma" >
+                            <div class="img-note">Figure: after ZCA.</div>
+                        </div>
+
+                    </section>
+
+                </section>
+
+
+                <section>
+                    <section>
+                        <h2>Single Convolutional Neural Network</h2>
+                        <div class="subtitle">Architecture: Convolutional and Max-pooling layers</div>
+                        <div class="div-left">
+                            <div style="min-height: 100px; overflow: hidden"></div>
+                            <pre><code>
+!obj:pylearn2.models.maxout.MaxoutConvC01B {
+    pad: 4,
+    num_channels: 48,
+    num_pieces: 2,
+    kernel_shape: [8, 8],
+    pool_shape: [4, 4],
+    irange: .005,
+},
+					        </code></pre>
+
+                            <div class="img-note">
+                                Figure: example of YAML code for convolutional layer definition.
+                            </div>
+
+                            <!--<div style="min-height: 50px; overflow: hidden"></div>-->
+
+                        </div>
+
+                        <div class="div-right">
+                            <div style="text-align: left; padding: 30px">
+                                <ul>
+                                    <li>The single architecture use $3$ convolutional layer $\{h_0, h_1, h_2\}$ with the following parameters:</li>
+                                    <ul>
+                                        <li><b>pad</b>: apply a padding of $n$ pixel:</li>
+                                        <ul>
+                                            <li>$4$, $3$, $3$</li>
+                                        </ul>
+                                        <li><b>num_channels</b>: is the number of feature maps:</li>
+                                        <ul>
+                                            <li>$48$, $128$, $128$</li>
+                                        </ul>
+                                        <li><b>num_pieces</b>: use $n$ linear models for each maxout unit;</li>
+                                        <ul>
+                                            <li>$2$, $2$, $2$</li>
+                                        </ul>
+                                        <li><b>kernel_shape</b>:</li>
+                                        <ul>
+                                            <li>$8\times8$, $8\times8$, $5\times5$</li>
+                                        </ul>
+                                       <li><b>pool_shape</b>:</li>
+                                        <ul>
+                                            <li>$4\times4$, $4\times4$, $2\times2$</li>
+                                        </ul>
+                                    </ul>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Single Convolutional Neural Network</h2>
+                        <div class="subtitle">Architecture: Fully connected layer</div>
+                        <div class="div-left">
+                            <div style="min-height: 50px; overflow: hidden"></div>
+                            <pre><code>
+!obj:pylearn2.models.maxout.Maxout {
+    layer_name: 'h3',
+    irange: .005,
+    num_units: 240,
+    num_pieces: 5,
+},
+					        </code></pre>
+
+                            <div class="img-note">
+                                Figure: example of YAML code for fully connected layer.
+                            </div>
+
+                            <!--<div style="min-height: 50px; overflow: hidden"></div>-->
+
+                        </div>
+
+                        <div class="div-right">
+                            <div style="text-align: left; padding: 30px">
+                                <ul>
+                                    <li>The single architecture use a fully connected layer $h_3$ with the following parameters:</li>
+                                    <ul>
+                                        <li><b>num_units</b>: use $240$ neurons with maxout activation function;</li>
+                                        <li><b>num_pieces</b>: use $5$ linear models for each maxout unit;</li>
+                                    </ul>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+
+                    <section>
+                        <h2>Single Convolutional Neural Network</h2>
+                        <div class="subtitle">Architecture: Softmax layer</div>
+                        <!--<div class="div-header">In training fase</div>-->
+
+
+                        <div class="div-left">
+                            <div style="min-height: 50px; overflow: hidden"></div>
+                            <pre><code>
+!obj:pylearn2.models.mlp.Softmax {
+    layer_name: 'y',
+    n_classes: 10,
+    irange: .005
+}
+					        </code></pre>
+
+                            <div class="img-note">
+                                Figure: example of YAML code for softmax layer.
+                            </div>
+                        </div>
+
+                        <div class="div-right">
+                            <div style="text-align: left; padding: 30px">
+                                <ul>
+                                    <li>The single architecture use a softmax layer $y$ with the following parameters:</li>
+                                    <ul>
+                                        <li><b>n_classes</b>: use $10$ output class vector;</li>
+                                    </ul>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Single Convolutional Neural Network</h2>
+                        <div class="subtitle">Training algorithm</div>
+
+                        <div>
+                            <pre><code>
+algorithm: !obj:pylearn2.training_algorithms.sgd.SGD {
+    learning_rate: .1,
+    learning_rule: !obj:pylearn2.training_algorithms.learning_rule.Momentum {
+        init_momentum: .5,
+    },
+    cost: !obj:pylearn2.costs.mlp.dropout.Dropout {
+        input_include_probs: { 'h0' : 0.8 },
+    },
+    termination_criterion: !obj:pylearn2.termination_criteria.MonitorBased {
+        channel_name: "valid_y_misclass",
+        prop_decrease: 0.,
+        N: 100
+    },
+},
+					        </code></pre>
+
+                            <div class="img-note">
+                                Figure: example of YAML code for softmax layer.
+                            </div>
+                        </div>
+
+                        <div class="div-alone" style="padding-left: 10px">
+                            The learning algorithm used is Minibatch SGD with the following parameters:
+                            <ul style="padding-left: 40px; padding-top: 10px">
+                                <li><b>Dropout</b>: apply dropout to the layer $h_0$ with $0.8$ probability;</li>
+                                <li><b>Termination criterion</b>: stop if miss class rate doesn't decrease in $100$ iterations;</li>
+                            </ul>
+                        </div>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>MCDNN architecture</h2>
+                        <div class="subtitle">Naive MCDNN</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>Single DNN predict the image class;</li>
+                                <li>All the prediction are averaged;</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <img src="./img/mcdnn_naive.png">
+                            <div class="img-note">Figure: Naive Multi-Column Deep Neural Network implementation.</div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>MCDNN architecture</h2>
+                        <div class="subtitle">MCDNN</div>
+
+                        <div class="div-alone">
+                            <ul>
+                                <li>Single DNN extract a feature vector;</li>
+                                <li>All the feature vectore are averaged;</li>
+                                <li>Softmax layer is trained to predict the image class from the averaged feature vector.</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <img src="./img/mcdnn_details.png">
+                            <div class="img-note">Figure: Multi-Column Deep Neural Network implementation.</div>
+                        </div>
+                    </section>
+
+                </section>
+
+                <section>
+
+                    <section>
+                        <h2>Results</h2>
+                        <div class="subtitle">Single vs MCDNN naive vs MCDNN</div>
+                        <br>
+                        <div class="datagrid"><table>
+                            <thead>
+                                <tr><th width="30%">Method</th><th width="14%">Mean Error</th><th width="14%">Var</th><th width="14%">Epochs</th><th width="14%">Time</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="alt"><td>Single GCN</td><td>0.189</td><td>0.153279</td><td>258</td><td>~17h</td></tr>
+                                <tr><td>Single TOR</td><td>0.2036</td><td>0.162147</td><td>260</td><td>~17h</td></tr>
+                                <tr class="alt"><td>Single ZCA</td><td>0.1514</td><td>0.128478</td><td>81</td><td>~7h</td></tr>
+                            </tbody>
+                            </table>
+                        </div>
+                        <div class="img-note">Tab 1. Single Column Deep Neural Network</div>
+                        <br>
+                        <div class="datagrid"><table>
+                            <thead>
+                                <tr><th width="30%">Method</th><th width="14%">Mean Error</th><th width="14%">Var</th></tr>
+                            </thead>
+                            <tbody>
+
+                                <tr><td>Multi-Naive GCN_TOR</td><td>0.1801</td><td>0.147663</td></tr>
+                                <tr class="alt"><td>Multi-Naive GCN_ZCA</td><td>0.151799</td><td>0.128756</td></tr>
+                                <tr><td>Multi-Naive ZCA_TOR </td><td>0.1424</td><td>0.122122</td></tr>
+                                <tr class="alt"><td>Multi-Naive GCN_TOR_ZCA</td><td>0.154</td><td>0.130283</td></tr>
+
+                            </tbody>
+                            </table>
+                        </div>
+                        <div class="img-note">Tab 2. Multi Column Deep Neural Network, naive implementation</div>
+                        <br>
+                        <div class="datagrid"><table>
+                            <thead>
+                                <tr><th width="30%">Method</th><th width="14%">Mean Error</th><th width="14%">Var</th><th width="14%">Epochs</th><th width="14%">Time</th></tr>
+                            </thead>
+                            <tbody>
+
+                                <tr><td>Multi GCN_TOR</td><td>0.1701</td><td>0.141165</td><td>50</td><td>~1,5h</td></tr>
+                                <tr class="alt"><td>Multi GCN_ZCA</td><td>0.1496</td><td>0.127219</td><td>50</td><td>~1,5h</td></tr>
+                                <tr><td>Multi ZCA_TOR</td><td><b>0.1330</b></td><td>0.115310</td><td>50</td><td>~1,5h</td></tr>
+                                <tr class="alt"><td>Multi GCN_TOR_ZCA</td><td>0.14810</td><td>0.126166</td><td>50</td><td>~2h</td></tr>
+                            </tbody>
+                            </table>
+                        </div>
+                        <div class="img-note">Tab 3. Multi Column Deep Neural Network</div>
+                    </section>
+
+                    <section>
+                        <h2>Results</h2>
+                        <div class="subtitle">Confusion Matrix</div>
+
+                        <div>
+                            <img src="./img/confusionMulti_ZCA_TOR.png" alt="unifi stemma" width="70%">
+                            <div class="img-note">Figure: confusion Matrix of a MCDNN: ZCA, TOR.</div>
+                        </div>
+
+                    </section>
+
+                    <section>
+                        <h2>Results</h2>
+                        <div class="subtitle">Our implementation vs Paper implementation</div>
+
+                        <div class="div-alone">
+                            <div class="datagrid"><table>
+                                <thead>
+                                    <tr><th>Method</th><th>#column</th><th>Architecture</th><th>Activation function</th><th>Mean error</th></tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr><td>Our implementation</td><td>2</td><td>48C8-MP4-128C8-MP4-128C5-MP2-240N-10N</td><td>Maxout</td><td>$13.30$%</td></tr>
+                                    <tr class="alt"><td>Paper implementation</td><td>8</td><td>300C3-MP2-300C2-MP2-300C3-MP2-300C2-MP2-300N-100N-10N</td><td>Hyperbolic tangent</td><td>$11.21$%</td></tr>
+
+                                </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="img-note">Table: Comparison between our implementation (best result) and paper implementation.</div>
+
+                        <br>
+                        <div class="div-alone">
+                            <ul>
+                                <li>Preprocessing used in our implementation:</li>
+                                <ul>
+                                    <li>ZCA whitening, Toronto preprocessing.</li>
+                                </ul>
+                                <li>Preprocessing used in the paper:</li>
+                                <ul>
+                                    <li>4 original dataset, image adjustment, histogram equalization, adaptive histogram equalization, contrast normalization.</li>
+                                </ul>
+                            </ul>
+                        </div>
+
+
+
+                    </section>
+                </section>
+
+                <section>
+                    <h2>References</h2>
+                    <div id="div-alone">
+                        <!--<object type="text/html" data="references.html">-->
+                        <!--<p>backup content</p>-->
+                        <!--</object>-->
+                        <ul>
+                            <li>[1] D. Cireșan, U. Meier and J. Schmidhuber: Multi-column Deep Neural Networks for Image Classification (2012);</li>
+                            <li>[2] D. H. Hubel and T. N. Wiesel: Receptive fields, binocular interaction and functional architecture in the cat's visual cortex (1962);</li>
+                            <li>[3] K. Fukushima: Neocognitron: A Self-organizing Neural Network Model for a Mechanism of Pattern Recognition Unaffected by Shift in Position (1980);</li>
+                            <li>[4] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever and R. R. Salakhutdinov: Improving neural networks by preventing co-adaptation of feature detectors (2012);</li>
+                            <li>[5] X. Glorot, A. Bordes and Y. Bengio: Deep sparse rectifier neural networks (2011);</li>
+                            <li>[6] I. J. Goodfellow, D. Warde-Farley, M. Mirza, A. Courville and Y. Bengio: Maxout Networks (2013);</li>
+                            <li>[7] A. Ng et al: Optimization: Stochastic Gradient Descent - Momentum - Tutorial Stanford University.</li>
+                        </ul>
+                    </div>
+                </section>
+
+            <section>
+                <div style="min-height: 50px; overflow: hidden"></div>
+                <div class="div-left">
+                    <img width="200" height="200" src="./img/Stemma.png" alt="unifi stemma" >
+					<h3 style="color: #586e75;">Università degli Studi di Firenze</h3>
+                    <p>Laurea Magistrale in Ingegneria Informatica</p>
+                    <p><small>Corso di Apprendimento Automatico</small></p>
+                    <br>
+					<h2 style="color: #586e75;">Multi-Column Deep Neural Networks for Image Classification</h2>
+					<p>
+						<small><a href="mailto:matteo.bruni@gmail.com">Matteo Bruni</a> - <a href="mailto:andrearizzo@outlook.com">Andrea Rizzo</a></small>
+					</p>
+                </div>
+
+
+                <div class="div-right">
+                    <div style="min-height: 170px; overflow: hidden"></div>
+                    <img src="./img/q&A.png" width="55%">
+                </div>
+            </section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+
+                // Display controls in the bottom right corner
+                controls: true,
+
+                // Display a presentation progress bar
+                progress: true,
+
+                // Display the page number of the current slide
+                slideNumber: true,
+
+                // Push each slide change to the browser history
+                history: true,
+
+                // Enable keyboard shortcuts for navigation
+                keyboard: true,
+
+                // Enable the slide overview mode
+                overview: true,
+
+                // Vertical centering of slides
+                center: true,
+
+                // Enables touch navigation on devices with touch input
+                touch: true,
+
+                // Loop the presentation
+                loop: false,
+
+                // Change the presentation direction to be RTL
+                rtl: false,
+
+                // Turns fragments on and off globally
+                fragments: true,
+
+                // Flags if the presentation is running in an embedded mode,
+                // i.e. contained within a limited portion of the screen
+                embedded: false,
+
+                // Number of milliseconds between automatically proceeding to the
+                // next slide, disabled when set to 0, this value can be overwritten
+                // by using a data-autoslide attribute on your slides
+                autoSlide: 0,
+
+                // Stop auto-sliding after user input
+                autoSlideStoppable: true,
+
+                // Enable slide navigation via mouse wheel
+                mouseWheel: true,
+
+                // Hides the address bar on mobile devices
+                hideAddressBar: true,
+
+                // Opens links in an iframe preview overlay
+                previewLinks: false,
+
+                // Transition style
+                transition: 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Transition speed
+                transitionSpeed: 'default', // default/fast/slow
+
+                // Transition style for full page slide backgrounds
+                backgroundTransition: 'default', // default/none/slide/concave/convex/zoom
+
+                // Number of slides away from the current that are visible
+                viewDistance: 3,
+
+                // Parallax background image
+                parallaxBackgroundImage: '', // e.g. "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'"
+
+                // Parallax background size
+                parallaxBackgroundSize: '', // CSS syntax, e.g. "2100px 900px"
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+                math: {
+                    mathjax: '../../mathjax/MathJax.js',
+                    config: 'TeX-AMS_HTML-full'  // See http://docs.mathjax.org/en/latest/config-files.html
+                },
+
+                dependencies: [
+                    // Cross-browser shim that fully implements classList - https://github.com/eligrey/classList.js/
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+
+                    // Interpret Markdown in <section> elements
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+
+                    // Syntax highlight for <code> elements
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+
+                    // Zoom in and out with Alt+click
+                    { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+
+                    // Speaker notes
+                    { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+
+                    // Remote control your reveal.js presentation using a touch device
+                    //{ src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } },
+
+                    // MathJax
+                    { src: 'plugin/math/math.js', async: true }
+                ]
+			});
+
+		</script>
+
+	</body>
+</html>
